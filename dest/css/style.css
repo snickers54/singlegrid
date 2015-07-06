@@ -1,0 +1,8 @@
+body {
+  color: red;
+  height: 600px; }
+  body #singlegrid {
+    position: absolute;
+    background-color: #FFF;
+    width: 100%;
+    height: 100%; }

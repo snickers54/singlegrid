@@ -1,0 +1,27 @@
+{
+  "name": "singleGrid",
+  "version": "1.0.0",
+  "description": "An awesome grid / dashboard system ",
+  "main": "singleGrid.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Julien Singler",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.7.13",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.1.0",
+    "gulp-karma": "0.0.4",
+    "gulp-minify": "0.0.5",
+    "gulp-sass": "^2.0.3",
+    "gulp-uglify": "^1.2.0",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.12.37",
+    "karma-babel-preprocessor": "^5.2.1",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-jasmine": "^0.3.6",
+    "karma-safari-launcher": "^0.1.1"
+  }
+}
