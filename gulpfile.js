@@ -5,7 +5,8 @@ var uglify = require('gulp-uglify');
 var minify = require('gulp-minify');
 var browserSync = require('browser-sync').create();
 var karma = require('karma').server;
-
+var plumber = require('gulp-plumber');
+var concat = require('gulp-concat');
 // Static server
 gulp.task('browser-sync', function() {
     browserSync.init({
@@ -17,7 +18,9 @@ gulp.task('browser-sync', function() {
 
 gulp.task("babel", function () {
 	 return gulp.src('./src/js/*.js')
-		.pipe(babel({compact:false}))
+	    .pipe(concat('all.js'))
+	    .pipe(plumber())
+		.pipe(babel({compact:false, modules:"common"}))
 		.on('error', console.error.bind(console))
 		.pipe(gulp.dest('dest'));
 });
@@ -33,7 +36,7 @@ gulp.task('sass', function () {
 
 gulp.task('babel:watch', ['babel'], function() {browserSync.reload();})
 
-gulp.task('default', ['browser-sync'], function(){
+gulp.task('default', ['babel', 'browser-sync'], function(){
 	gulp.watch('./src/**/*.scss', ['sass']);
 	gulp.watch('./src/**/*.js', ['babel:watch']);
 });
