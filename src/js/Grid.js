@@ -78,6 +78,7 @@ class Grid {
 			}
 			element.dom = Drawer.generateDOM(element, this.DOM);
 		}
+		this.manageDragDropCallBacks(element);
 		if (element.dom.parentNode.id != this.DOMId) {
 			console.warn('You are trying to use elements outside the parent DOM element : #' + this.DOMId);
 		}
@@ -96,6 +97,20 @@ class Grid {
 
 		console.info('Element', element, 'has been injected into the grid.');
 		return true;
+	}
+
+	const EVENTS = {
+		dragstart : function(event, element) {
+			if (typeof element.dragstart === "function") {
+				element.dragstart(event);
+			}
+		},
+	}
+
+  manageDragDropCallBacks(element) {
+		this.drawer.removeDragDropAttributes(element);
+		this.drawer.addDragDropAttributes(element, this.EVENTS);
+		//
 	}
 
 	remove(element) {
