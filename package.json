@@ -24,5 +24,8 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-jasmine": "^0.3.6",
     "karma-safari-launcher": "^0.1.1"
+  },
+  "dependencies": {
+    "gulp-concat": "^2.6.0"
   }
 }

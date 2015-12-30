@@ -1,7 +1,7 @@
 
 
 /**
-* Grid class 
+* Grid class
 * Main class of single grid ..
 */
 
@@ -36,11 +36,21 @@ class Grid {
 		for (let i = 0; i < context.grid.length; i++) {
 			let element = context.grid[i];
 			if (context.isOutOfGrid(element) || element.x == null) {
-				console.log(">>>>>>", element);
+				this.remove(element);
 				if (context.setNewPosition(element)) {
 					context.hashtable.update(element);
 				}
 				context.drawer.draw(element);
+			} else {
+				let pos = context.hashtable.findPosition(element.width, element.height);
+				if (pos != null &&
+						pos.y < element.y) {
+						this.remove(element);
+						if (context.setNewPosition(element, pos)) {
+							context.hashtable.update(element);
+						}
+						context.drawer.draw(element);
+				}
 			}
 		}
 	}
@@ -76,7 +86,7 @@ class Grid {
 			return false;
 		}
 		// the order over here is important, If this element has no valid starting positions OR there is no space on its current coordinates..
-		if ((element.x == null && element.y == null) || 
+		if ((element.x == null && element.y == null) ||
 			(element.x === undefined || element.y === undefined)){
 			// let's bruteforce our hashmap to find something interesting
 			this.setNewPosition(element);
@@ -95,8 +105,13 @@ class Grid {
 		this.drawer.draw(element);
 	}
 
-	setNewPosition(element) {
-		let positions = this.hashtable.findPosition(element.width, element.height);
+	setNewPosition(element, pos) {
+		let positions;
+		if (typeof pos !== "undefined") {
+			positions = pos;
+		} else {
+			positions = this.hashtable.findPosition(element.width, element.height);
+		}
 		if (!positions) {
 			console.warn('There is no valid emplacement for this element');
 			this.hashtable.remove(element);
