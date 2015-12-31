@@ -9,26 +9,43 @@ class Grid {
 
 	constructor(DOMId, config) {
 		console.info('Loading singleGrid on', DOMId);
-		this.DOMId = DOMId;
-		this.DOM = {ref: document.getElementById(DOMId)};
 		this.grid = [];
 		this.stackId = 0;
 		this.config = config || {blockWidth: 80, blockHeight: 80, marginHeight: 20, marginWidth: 20};
-		let element = this.DOM.ref;
-		this.DOM.height = element.offsetHeight;
-		this.DOM.width = element.offsetWidth;
-		this.hashtable = new Hashtable(this.DOM, this.config);
-		this.drawer = new Drawer(this.config);
+		this.drawer = new Drawer(this.config, {ref: document.getElementById(DOMId), id:DOMId});
+		this.hashtable = new Hashtable(this.config, this.drawer.getDOM());
 		this.drawer.init(this.hashtable.properties);
+		this.DOM = this.drawer.getDOM();
 		let context = this;
 		window.addEventListener('resize', debounce(function(){context.resizing(context);}, 250));
-		console.info(this.DOM.ref, 'is like this :', this.DOM);
+		console.info(this.drawer.getDOM().ref, 'is like this :', this.drawer.getDOM());
+
+		this.EVENTS = {
+			drag: function(event, element, self) {
+				if (element._dragging == true) return ;
+				element._dragging = true;
+				self.hashtable.remove(element);
+				element.x = element.y = null;
+				self.drawer.draw(element);
+				if (typeof element.drag === 'function') {
+					element.drag(event);
+				}
+			},
+			drop: function(event, element, self) {
+				element._dragging = false;
+				if (typeof element.drop === 'function') {
+					element.drop(event);
+				}
+			}
+		};
+
+
 	}
 
 	resizing(context) {
-		let element = context.DOM.ref;
-		context.DOM.height = element.offsetHeight;
-		context.DOM.width = element.offsetWidth;
+		let element = context.drawer.getDOM().ref;
+		context.drawer.getDOM().height = element.offsetHeight;
+		context.drawer.getDOM().width = element.offsetWidth;
 		context.hashtable.calculateGridSize();
 		context.hashtable.updateHashtableSize();
 		console.info('Hashtable : ', context.hashtable);
@@ -99,17 +116,9 @@ class Grid {
 		return true;
 	}
 
-	const EVENTS = {
-		dragstart : function(event, element) {
-			if (typeof element.dragstart === "function") {
-				element.dragstart(event);
-			}
-		},
-	}
-
   manageDragDropCallBacks(element) {
 		this.drawer.removeDragDropAttributes(element);
-		this.drawer.addDragDropAttributes(element, this.EVENTS);
+		this.drawer.addDragDropAttributes(element, this.EVENTS, this);
 		//
 	}
 

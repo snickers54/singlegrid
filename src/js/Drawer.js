@@ -3,15 +3,23 @@
 * HTML Handler class
 */
 class Drawer {
-	constructor(config){
+	constructor(config, DOM){
 		console.info('Loading Drawer');
 		this.config = config;
+		this.DOM = DOM;
+		let element = this.DOM.ref;
+		this.DOM.height = element.offsetHeight;
+		this.DOM.width = element.offsetWidth;
+		this.DOM.DOMrect = this.DOM.ref.getBoundingClientRect();
+		console.log(this.DOM.DOMrect);
 	}
 
 	init(struct) {
 		this.generateCSS(struct);
 	}
-
+	getDOM() {
+		return this.DOM;
+	}
 	generateCSS(struct) {
       let styles = '[sg-col="null"] { display:none;}\n[sg-row="null"] { display:none;}';
       /* generate CSS styles for cols */
@@ -41,12 +49,13 @@ class Drawer {
       //console.log(styles, 'calculated.');
       this.addStyleTag(styles);
   };
-  static generateDOM(element, DOM) {
+  static generateDOM(element, dom) {
   	var newDiv = document.createElement("div");
   	newDiv.setAttribute('id', element.id);
-  	DOM.ref.appendChild(newDiv);
+  	dom.ref.appendChild(newDiv);
   	return newDiv;
   }
+
 	removeDragDropAttributes(element) {
 		// check if this callbacks are available as attributes.
 		// if yes, remove them .. we don't want any interference !
@@ -60,9 +69,12 @@ class Drawer {
 		element.dom.removeAttribute('ondragleave');
 	}
 
-	addDragDropAttributes(element, EVENTS) {
-			element.dom.addEventListener('dragstart', function(event) {
-				EVENTS.dragstart(event, element);
+	addDragDropAttributes(element, EVENTS, self) {
+			element.dom.addEventListener('drag', function(event) {
+				EVENTS.drag(event, element, self);
+			});
+			element.dom.addEventListener('drop', function(event) {
+				EVENTS.drag(event, element, self);
 			});
 	}
 
@@ -77,6 +89,25 @@ class Drawer {
 			element.dom.setAttribute('draggable', true);
 		}
   }
+
+	posToPx(col, row) {
+		// config = {blockWidth: 80, blockHeight: 80, marginHeight: 20, marginWidth: 20};
+		// position {0, 0}u equals {0, 0}px
+		let i = 0;
+		var x, y;
+		x = (col * this.config.blockWidth) + (Math.max(col - 1, 0) * this.config.marginWidth);
+		y = (row * this.config.blockHeight) + (Math.max(row - 1, 0) * this.config.marginHeight);
+		return {x:x, y:y};
+	}
+
+	pxToPos(x, y) {
+		var col, row;
+
+		col = (x - this.DOM.DOMrect.left) / (this.config.marginWidth + this.config.blockWidth);
+		row = (y - this.DOM.DOMrect.top) / (this.config.marginHeight + this.config.blockHeight);
+
+		return {col:col, row:row};
+	}
 
 	addStyleTag(css) {
         let d = document;

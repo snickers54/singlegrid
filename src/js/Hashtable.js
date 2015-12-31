@@ -1,9 +1,9 @@
 /**
-* Hashtable class 
+* Hashtable class
 * Optimization to get quickly a good position
 */
 class Hashtable {
-	constructor(DOM, config) {
+	constructor(config, DOM) {
 		console.log('Initialized Hashtable');
 		this.DOM = DOM;
 		this.hashtable = new Map();
@@ -27,7 +27,7 @@ class Hashtable {
 	}
 
 	init() {
-		if (!this.config.hasOwnProperty('blockWidth') || !this.config.hasOwnProperty('blockHeight') || 
+		if (!this.config.hasOwnProperty('blockWidth') || !this.config.hasOwnProperty('blockHeight') ||
 			!this.config.hasOwnProperty('marginWidth') || !this.config.hasOwnProperty('marginHeight')) {
 			return false;
 		}
@@ -40,7 +40,7 @@ class Hashtable {
 	}
 
 	updateHashtableSize() {
-		// removing exceeding lines : 
+		// removing exceeding lines :
 		for (let y = 0; y < this.hashtable.size; y++) {
 			if (this.hashtable.has(y)) {
 				let size = this.hashtable.get(y).size;
