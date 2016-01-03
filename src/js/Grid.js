@@ -22,26 +22,40 @@ class Grid {
 
 		this.EVENTS = {
 			drag: function(event, element, self) {
-				if (element._dragging == true) return ;
-				element._dragging = true;
-				self.hashtable.remove(element);
-				element.x = element.y = null;
-				self.drawer.draw(element);
+				console.log(event.x, event.y);
+				element.dom.style.top = event.y+"px";
+				element.dom.style.left = event.x+"px";
 				if (typeof element.drag === 'function') {
 					element.drag(event);
 				}
 			},
+			dragstart: function(event, element, self) {
+				console.log(context.drawer.getPreview());
+		    event.dataTransfer.setDragImage(context.drawer.getPreview(), 0, 0);
+				self.hashtable.remove(element);
+				if (typeof element.dragstart === 'function') {
+					element.dragstart(event);
+				}
+			},
 			drop: function(event, element, self) {
-				element._dragging = false;
+				element.dom.style.top = "";
+				element.dom.style.left = "";
 				if (typeof element.drop === 'function') {
 					element.drop(event);
 				}
-			}
+			},
+			dragover: this.cancelEvent,
+			dragenter: this.cancelEvent
 		};
 
 
 	}
-
+	cancelEvent(event) {
+		if (event.preventDefault) {
+			event.preventDefault();
+		}
+		return false;
+	}
 	resizing(context) {
 		let element = context.drawer.getDOM().ref;
 		context.drawer.getDOM().height = element.offsetHeight;

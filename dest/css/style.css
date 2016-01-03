@@ -9,4 +9,4 @@ body {
     body #singlegrid .sg-widget {
       border: 1px solid black;
       position: absolute;
-      transition: all 0.3s ease-out; }
+      -khtml-user-drag: element; }

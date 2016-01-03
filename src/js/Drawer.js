@@ -11,6 +11,7 @@ class Drawer {
 		this.DOM.height = element.offsetHeight;
 		this.DOM.width = element.offsetWidth;
 		this.DOM.DOMrect = this.DOM.ref.getBoundingClientRect();
+		this.preview = undefined;
 		console.log(this.DOM.DOMrect);
 	}
 
@@ -20,8 +21,16 @@ class Drawer {
 	getDOM() {
 		return this.DOM;
 	}
+	getPreview() {
+		if (typeof this.preview === "undefined") {
+			this.preview = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+  		this.preview.width = this.preview.height = 1;
+			document.body.appendChild(this.preview);
+		}
+		return this.preview;
+	}
 	generateCSS(struct) {
-      let styles = '[sg-col="null"] { display:none;}\n[sg-row="null"] { display:none;}';
+      let styles = '[sg-col="null"] { display:none;}\n[sg-row="null"] {display:none;}';
       /* generate CSS styles for cols */
       for (let i = struct.nHorizontal + 20; i >= 0; i--) {
           let col = ((i * this.config.blockWidth) + (i * this.config.marginWidth));
@@ -73,8 +82,11 @@ class Drawer {
 			element.dom.addEventListener('drag', function(event) {
 				EVENTS.drag(event, element, self);
 			});
+			element.dom.addEventListener('dragstart', function(event) {
+				EVENTS.dragstart(event, element, self);
+			});
 			element.dom.addEventListener('drop', function(event) {
-				EVENTS.drag(event, element, self);
+				EVENTS.drop(event, element, self);
 			});
 	}
 
@@ -105,7 +117,7 @@ class Drawer {
 
 		col = (x - this.DOM.DOMrect.left) / (this.config.marginWidth + this.config.blockWidth);
 		row = (y - this.DOM.DOMrect.top) / (this.config.marginHeight + this.config.blockHeight);
-
+		console.log("pxToPos : col=", col, "row=",row);
 		return {col:col, row:row};
 	}
 
