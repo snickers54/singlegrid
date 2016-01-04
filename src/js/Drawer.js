@@ -85,15 +85,15 @@ class Drawer {
 			element.dom.addEventListener('dragstart', function(event) {
 				EVENTS.dragstart(event, element, self);
 			});
-			element.dom.addEventListener('drop', function(event) {
-				EVENTS.drop(event, element, self);
+			element.dom.addEventListener('dragend', function(event) {
+				EVENTS.dragend(event, element, self);
 			});
 	}
 
   draw(element) {
   	console.log('Adding attributes on element : ', element);
-  	element.dom.setAttribute('sg-col', element.x);
-  	element.dom.setAttribute('sg-row', element.y);
+  	element.dom.setAttribute('sg-col', element.col);
+  	element.dom.setAttribute('sg-row', element.row);
   	element.dom.setAttribute('sg-width', element.width);
   	element.dom.setAttribute('sg-height', element.height);
   	element.dom.setAttribute('class', 'sg-widget');
@@ -117,8 +117,8 @@ class Drawer {
 
 		col = (x - this.DOM.DOMrect.left) / (this.config.marginWidth + this.config.blockWidth);
 		row = (y - this.DOM.DOMrect.top) / (this.config.marginHeight + this.config.blockHeight);
-		console.log("pxToPos : col=", col, "row=",row);
-		return {col:col, row:row};
+		console.log("pxToPos : col=", Math.ceil(col), "row=",Math.ceil(row));
+		return {col:Math.floor(col), row:Math.floor(row)};
 	}
 
 	addStyleTag(css) {

@@ -72,15 +72,15 @@ class Hashtable {
 
 	update(element) {
 		console.log("UPDATE ELEMENTS");
-		if (!element.hasOwnProperty('x') || !element.hasOwnProperty('y')) {
+		if (!element.hasOwnProperty('col') || !element.hasOwnProperty('row')) {
 			console.warn('Element', element, 'has no correct coordinates.');
 			return false;
 		}
-		for (let y = element.y; y < element.y + element.height; y++) {
+		for (let y = element.row; y < element.row + element.height; y++) {
 			let row = this.hashtable.get(y);
 			let count = 0;
 			if (row) {
-				for (let x = element.x; x < element.x + element.width; x++) {
+				for (let x = element.col; x < element.col + element.width; x++) {
 					count++;
 					row.set(x, true);
 				}
@@ -92,13 +92,13 @@ class Hashtable {
 	}
 
 	remove(element) {
-		if (element.x == null || element.y == null) {
+		if (element.col == null || element.row == null) {
 			return;
 		}
-		for (let y = element.y; y < element.y + element.height; y++) {
+		for (let y = element.row; y < element.row + element.height; y++) {
 			let row = this.hashtable.get(y)
 			if (!row) {continue;}
-			for (let x = element.x; x < element.x + element.width; x++) {
+			for (let x = element.col; x < element.col + element.width; x++) {
 				if (!row.get(x)) {continue;}
 				row.set(x, false);
 			}
@@ -147,7 +147,7 @@ class Hashtable {
 			for (let x = 0; x < this.struct.nHorizontal; x++) {
 				let countLines = 0;
 				for (let y = 0; y < heightMax; y++) {
-					//console.log("SEARCHIN ON x:", x, "y:", y, "height:", height, "nVertical:",this.struct.nVertical, "sum : ", (y + height));
+					console.log("SEARCHIN ON x:", x, "y:", y, "height:", height, "nVertical:",this.struct.nVertical, "sum : ", (y + height));
 					let line = this.hashtable.get(y);
 					if (!line) {
 						continue;
@@ -157,7 +157,7 @@ class Hashtable {
 					}
 					if (countLines == height) {
 						console.log("Found appropriate positon : ", x, y - (height - 1));
-						return {x:x, y:y - (height - 1)};
+						return {col:x, row:y - (height - 1)};
 					}
 				}
 			}

@@ -5,8 +5,8 @@ describe('Init hashtable class', function(){
 		this.properties = this.hashtable.properties;
 		this.height = 2;
 		this.width = 2;
-		this.x = 0;
-		this.y = 0;
+		this.col = 0;
+		this.row = 0;
 	});
 
 	it('check instantiation hashtable', function(){
@@ -19,7 +19,7 @@ describe('Init hashtable class', function(){
 	});
 
 	it('should impact the hashtable and putting some true ..', function(){
-		this.hashtable.update({height:this.height, width:this.width, x:this.x, y:this.y, id:"1"});
+		this.hashtable.update({height:this.height, width:this.width, x:this.col, y:this.row, id:"1"});
 		var table = this.hashtable.table;
 		for (var i = 0; i < this.height; i++) {
 			for (var j = 0; j < this.width; j++) {
@@ -31,8 +31,8 @@ describe('Init hashtable class', function(){
 		}
 	});
 	it('should see there is no place', function(){
-		var line = this.hashtable.table[this.y];
-		var bool = this.hashtable.testLine(this.width, line, this.x);
+		var line = this.hashtable.table[this.row];
+		var bool = this.hashtable.testLine(this.width, line, this.col);
 		expect(bool).toBe(false);
 	});
 });

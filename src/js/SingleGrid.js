@@ -1,7 +1,3 @@
-	function test(event) {
-		console.log("IIIIIIII");
-		console.log("IIIIIIII");
-	}
 (function(window, document, undefined){
 	window.onload = function () {
 		var grid = new Grid('singlegrid');
