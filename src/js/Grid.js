@@ -11,57 +11,76 @@ class Grid {
 		console.info('Loading singleGrid on', DOMId);
 		this.grid = [];
 		this.stackId = 0;
-		this.config = config || {blockWidth: 80, blockHeight: 80, marginHeight: 20, marginWidth: 20};
+		this.config = config || {blockWidth: 80, blockHeight: 80, marginHeight: 20, marginWidth: 20, algorithm:"AlgorithmPushDown", algorithmParams:[]};
 		this.drawer = new Drawer(this.config, {ref: document.getElementById(DOMId), id:DOMId});
 		this.hashtable = new Hashtable(this.config, this.drawer.getDOM());
+
+		// Algorithm part :D
+		Algorithm.add("AlgorithmPushDown", AlgorithmPushDown);
+		let instance = Algorithm.init(this.config.algorithm);
+		// like these varargs
+		this.algorithm = new instance(this, this.hashtable, this.config, ...this.config.algorithmParams);
 		this.drawer.init(this.hashtable.properties);
 		this.DOM = this.drawer.getDOM();
 		let context = this;
-		window.addEventListener('resize', debounce(function(){context.resizing(context);}, 250));
+		window.addEventListener('resize', debounce(function(){context._resizing(context);}, 250));
 		console.info(this.drawer.getDOM().ref, 'is like this :', this.drawer.getDOM());
 
 		this.EVENTS = {
-			drag: function(event, element, self) {
-				console.log(event.x, event.y, event);
-				if (event.x != 0 && event.y != 0) {
-					element.dom.style.top = event.y+"px";
-					element.dom.style.left = event.x+"px";
-					if (typeof element.drag === 'function') {
-						element.drag(event);
-					}
-				}
-			},
-			dragstart: function(event, element, self) {
-		    event.dataTransfer.setDragImage(context.drawer.getPreview(), 0, 0);
-				self.hashtable.remove(element);
-				if (typeof element.dragstart === 'function') {
-					element.dragstart(event);
-				}
-			},
-			dragend: function(event, element, self) {
-				console.log("HERE DROP, ", element);
-				let positions = self.drawer.pxToPos(event.x, event.y);
-				element.dom.style.top = "";
-				element.dom.style.left = "";
-				console.log(event.x, event.y, positions);
-				if (!self.setNewPosition(element, positions)) {
-					self.setNewPosition(element);
-				}
-				self.hashtable.update(element);
-				self.drawer.draw(element);
-				if (typeof element.drop === 'function') {
-					element.drop(event);
-				}
-			},
+			drag: this._drag,
+			dragstart: this._dragstart,
+			dragend: this._dragend,
 		};
 	}
+	_drag(self, event, element) {
+		console.log(event.x, event.y, event);
+		if (event.x != 0 && event.y != 0) {
+			element.dom.style.top = event.y+"px";
+			element.dom.style.left = event.x+"px";
 
-	resizing(context) {
+			// Here we call our developer callback
+			if (typeof element.drag === 'function') {
+				element.drag(event);
+			}
+		}
+	}
+
+	_dragend(self, event, element) {
+		element.dom.style.top = "";
+		element.dom.style.left = "";
+
+		this.algorithm.run();
+// this (below) should be done inside our Algorithm extended class .. 
+/*		let positions = self.drawer.pxToPos(event.x, event.y);
+
+		console.log(event.x, event.y, positions);
+		if (!self.setNewPosition(element, positions)) {
+			self.setNewPosition(element);
+		}
+		self.hashtable.update(element);
+		self.drawer.draw(element);
+*/
+		// Here we call our developer callback
+		if (typeof element.drop === 'function') {
+			element.drop(event);
+		}
+	}
+
+	_dragstart(self, event, element) {
+		event.dataTransfer.setDragImage(self.drawer.getPreview(), 0, 0);
+		self.hashtable.remove(element);
+
+		// Here we call our developer callback
+		if (typeof element.dragstart === 'function') {
+			element.dragstart(event);
+		}
+	}
+	_resizing(context) {
 		let element = context.drawer.getDOM().ref;
 		context.drawer.getDOM().height = element.offsetHeight;
 		context.drawer.getDOM().width = element.offsetWidth;
 		context.hashtable.calculateGridSize();
-		context.hashtable.updateHashtableSize();
+		context.hashtable.updateSize();
 		console.info('Hashtable : ', context.hashtable);
 
 		for (let i = 0; i < context.grid.length; i++) {
@@ -94,6 +113,7 @@ class Grid {
 		}
 		return false;
 	}
+
 
 	add(element) {
 		this.stackId++;

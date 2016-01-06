@@ -33,20 +33,19 @@ class Hashtable {
 		}
 		this.calculateGridSize();
 
-		this.updateHashtableSize();
+		this.updateSize();
 
 		console.info('Hashtable : ', this.hashtable);
 		return true;
 	}
 
-	updateHashtableSize() {
+	updateSize() {
 		// removing exceeding lines :
 		for (let y = 0; y < this.hashtable.size; y++) {
 			if (this.hashtable.has(y)) {
-				let size = this.hashtable.get(y).size;
-				for (let x = this.struct.nHorizontal; x < size; x++) {
-					let line = this.hashtable.get(y);
-					line.set(x, false);
+				let line = this.hashtable.get(y);
+				for (let x = this.struct.nHorizontal; x < line.size; x++) {
+					line.set(x, undefined);
 				}
 			}
 		}
@@ -58,7 +57,7 @@ class Hashtable {
 			}
 			for (let j = 0; j < this.struct.nHorizontal; j++) {
 				if (!space.has(j)) {
-					space.set(j, false);
+					space.set(j, undefined);
 				}
 			}
 			let size = 0;
@@ -68,7 +67,12 @@ class Hashtable {
 			this.hashtable.set(i, space);
 		}
 	}
-
+  /*return a reference to the object found or undefined :D */
+	getElement(x, y) {
+		if (!this.hashtable.has(y)) return undefined;
+		let row = this.hashtable.get(y);
+		return row.get(x);
+	}
 
 	update(element) {
 		console.log("UPDATE ELEMENTS");
@@ -82,12 +86,12 @@ class Hashtable {
 			if (row) {
 				for (let x = element.col; x < element.col + element.width; x++) {
 					count++;
-					row.set(x, true);
+					row.set(x, element);
 				}
-				console.log("row : ", y, row);
+				//console.log("row : ", y, row);
 			}
 		}
-		console.log(this.hashtable);
+		//console.log(this.hashtable);
 		return true;
 	}
 
@@ -105,28 +109,22 @@ class Hashtable {
 		}
 	}
 
-	/*testSpace(element) {
-		for (let y = element.y; y < element.y + element.height - 1; y++) {
-			let line = this.hashtable.get(y);
-			if (!line) {
-				return false;
-			}
-			for (let x = element.x; x < element.x + element.width - 1; x++) {
-				let col = line.get(x);
-				if (col === true) {
-					return false;
-				}
+	collide(x, y, width, height) {
+		for (let row = y; row < y + height; row++) {
+			let line = this.hashtable.get(row);
+			if (testLine(width, line, x) == false) {
+				return true;
 			}
 		}
-		return true;
-	}*/
+		return false;
+	}
 
 	testLine(width, line, position) {
 		let consecutiveCols = 0;
 		for (let y = position; y < this.struct.nHorizontal; y++) {
 			let col = line.get(y);
 			consecutiveCols += 1;
-			if (col === true) {
+			if (col !== undefined) {
 				consecutiveCols = 0;
 				break;
 			}
@@ -147,11 +145,9 @@ class Hashtable {
 			for (let x = 0; x < this.struct.nHorizontal; x++) {
 				let countLines = 0;
 				for (let y = 0; y < heightMax; y++) {
-					console.log("SEARCHIN ON x:", x, "y:", y, "height:", height, "nVertical:",this.struct.nVertical, "sum : ", (y + height));
+					//console.log("SEARCHIN ON x:", x, "y:", y, "height:", height, "nVertical:",this.struct.nVertical, "sum : ", (y + height));
 					let line = this.hashtable.get(y);
-					if (!line) {
-						continue;
-					}
+					if (!line) {continue;}
 					if (this.testLine(width, line, x)) {
 						countLines += 1;
 					}

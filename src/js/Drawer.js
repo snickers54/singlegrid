@@ -80,13 +80,13 @@ class Drawer {
 
 	addDragDropAttributes(element, EVENTS, self) {
 			element.dom.addEventListener('drag', function(event) {
-				EVENTS.drag(event, element, self);
+				EVENTS.drag(self, event, element);
 			});
 			element.dom.addEventListener('dragstart', function(event) {
-				EVENTS.dragstart(event, element, self);
+				EVENTS.dragstart(self, event, element);
 			});
 			element.dom.addEventListener('dragend', function(event) {
-				EVENTS.dragend(event, element, self);
+				EVENTS.dragend(self, event, element);
 			});
 	}
 
