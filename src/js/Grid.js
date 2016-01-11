@@ -19,7 +19,7 @@ class Grid {
 		Algorithm.add("AlgorithmPushDown", AlgorithmPushDown);
 		let instance = Algorithm.init(this.config.algorithm);
 		// like these varargs
-		this.algorithm = new instance(this, this.hashtable, this.config, ...this.config.algorithmParams);
+		this.algorithm = new instance(this, this.hashtable, this.drawer, this.config, ...this.config.algorithmParams);
 		this.drawer.init(this.hashtable.properties);
 		this.DOM = this.drawer.getDOM();
 		let context = this;
@@ -33,10 +33,10 @@ class Grid {
 		};
 	}
 	_drag(self, event, element) {
-		console.log(event.x, event.y, event);
+		console.log(event.screenX - event.offsetX, event.screenY - event.offsetY);
 		if (event.x != 0 && event.y != 0) {
-			element.dom.style.top = event.y+"px";
-			element.dom.style.left = event.x+"px";
+			element.dom.style.top = (event.pageY  - element.mouse.y) +"px";
+			element.dom.style.left = (event.pageX - element.mouse.x)+"px";
 
 			// Here we call our developer callback
 			if (typeof element.drag === 'function') {
@@ -49,17 +49,8 @@ class Grid {
 		element.dom.style.top = "";
 		element.dom.style.left = "";
 
-		this.algorithm.run();
-// this (below) should be done inside our Algorithm extended class .. 
-/*		let positions = self.drawer.pxToPos(event.x, event.y);
+		self.algorithm.run(event, element);
 
-		console.log(event.x, event.y, positions);
-		if (!self.setNewPosition(element, positions)) {
-			self.setNewPosition(element);
-		}
-		self.hashtable.update(element);
-		self.drawer.draw(element);
-*/
 		// Here we call our developer callback
 		if (typeof element.drop === 'function') {
 			element.drop(event);
@@ -67,6 +58,7 @@ class Grid {
 	}
 
 	_dragstart(self, event, element) {
+		element.mouse = {x: event.layerX, y: event.layerY};
 		event.dataTransfer.setDragImage(self.drawer.getPreview(), 0, 0);
 		self.hashtable.remove(element);
 

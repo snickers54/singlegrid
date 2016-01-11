@@ -8,7 +8,7 @@ const __ctors = {};
 
 // abstract class, we don't anybody to instantiate this one ..
 class Algorithm {
-  constructor(grid, hashtable, config) {
+  constructor(grid, hashtable, drawer, config) {
     // so we tricks the best we can to avoid it :D Because real abstract pattern doesn't even exists in this language.
     if (new.target === Algorithm) {
       throw new TypeError("Cannot construct Abstract instances directly");
@@ -16,6 +16,7 @@ class Algorithm {
     this.grid = grid;
     this.hashtable = hashtable;
     this.config = config;
+    this.drawer = drawer;
   }
 
   static add(name, ctor) {

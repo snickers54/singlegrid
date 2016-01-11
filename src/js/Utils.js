@@ -17,6 +17,13 @@ function debounce(func, wait, immediate) {
 	};
 };
 
+function objectExists(array, object) {
+	for (let i = 0; i < array.length; i++) {
+		if (array[i] == object) return true;
+	}
+	return false;
+}
+
 function throttle(fn, threshhold, scope) {
   threshhold || (threshhold = 250);
   var last,

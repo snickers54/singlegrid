@@ -104,9 +104,24 @@ class Hashtable {
 			if (!row) {continue;}
 			for (let x = element.col; x < element.col + element.width; x++) {
 				if (!row.get(x)) {continue;}
-				row.set(x, false);
+				row.set(x, undefined);
 			}
 		}
+	}
+
+	collideElements(x, y, width, height) {
+		var array = [];
+		for (let row = y; row < y + height; row++) {
+			let line = this.hashtable.get(row);
+			if (!line) break;
+			for (let col = x; col < x + width; col++) {
+				let element = line.get(col);
+				if (element !== undefined && !objectExists(array, element)) {
+					array.push(element);
+				}
+			}
+		}
+		return array;
 	}
 
 	collide(x, y, width, height) {
