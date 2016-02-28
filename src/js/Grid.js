@@ -24,7 +24,7 @@ class Grid {
 		this.DOM = this.drawer.getDOM();
 		let context = this;
 		window.addEventListener('resize', debounce(function(){context._resizing(context);}, 250));
-		console.info(this.drawer.getDOM().ref, 'is like this :', this.drawer.getDOM());
+		// console.info(this.drawer.getDOM().ref, 'is like this :', this.drawer.getDOM());
 
 		this.EVENTS = {
 			drag: this._drag,
@@ -32,12 +32,31 @@ class Grid {
 			dragend: this._dragend,
 		};
 	}
+	get() {
+		return this.grid;
+	}
 	_drag(self, event, element) {
-		console.log(event.screenX - event.offsetX, event.screenY - event.offsetY);
+		// console.log(event);
 		if (event.x != 0 && event.y != 0) {
-			element.dom.style.top = (event.pageY  - element.mouse.y) +"px";
-			element.dom.style.left = (event.pageX - element.mouse.x)+"px";
+			element.dom.style.top = (event.pageY  - element.mouse.y) + "px";
+			element.dom.style.left = (event.pageX - element.mouse.x) + "px";
 
+			let preview = self.drawer.getPreview();
+			let positions = self.drawer.pxToPos(event.pageX, event.pageY);
+			preview.col = positions.col;
+			preview.row = positions.row;
+			self.drawer.draw(preview);
+
+			var collided = self.hashtable.collideElements(positions.col, positions.row, element.width, element.height);
+			var old = document.getElementsByClassName("collide");
+			// Don't forget getElementsByClassName return a LIVE collection, which means, when I'm removing the class collide, my collection changes ..
+			// That's why I'm not using a basic for (var i =0; i < ...
+			while (old.item(0) !== null) {old.item(0).removeClass("collide");}
+			var toto = document.getElementsByClassName("collide");
+			for (var i = 0; i < collided.length; i++) {
+				var value = collided[i];
+				value.dom.addClass("collide");
+			}
 			// Here we call our developer callback
 			if (typeof element.drag === 'function') {
 				element.drag(event);
@@ -49,6 +68,11 @@ class Grid {
 		element.dom.style.top = "";
 		element.dom.style.left = "";
 
+		let preview = self.drawer.getPreview();
+		preview.col = null;
+		preview.row = null;
+		self.drawer.draw(preview);
+
 		self.algorithm.run(event, element);
 
 		// Here we call our developer callback
@@ -59,8 +83,13 @@ class Grid {
 
 	_dragstart(self, event, element) {
 		element.mouse = {x: event.layerX, y: event.layerY};
-		event.dataTransfer.setDragImage(self.drawer.getPreview(), 0, 0);
+		event.dataTransfer.setDragImage(self.drawer.getHiddenDragImage(), 0, 0);
 		self.hashtable.remove(element);
+
+		let preview = self.drawer.getPreview();
+		preview.width = element.width;
+		preview.height = element.height;
+		self.drawer.draw(preview);
 
 		// Here we call our developer callback
 		if (typeof element.dragstart === 'function') {
@@ -73,7 +102,7 @@ class Grid {
 		context.drawer.getDOM().width = element.offsetWidth;
 		context.hashtable.calculateGridSize();
 		context.hashtable.updateSize();
-		console.info('Hashtable : ', context.hashtable);
+		// console.info('Hashtable : ', context.hashtable);
 
 		for (let i = 0; i < context.grid.length; i++) {
 			let element = context.grid[i];
@@ -138,11 +167,11 @@ class Grid {
 		this.hashtable.update(element);
 		this.drawer.draw(element);
 
-		console.info('Element', element, 'has been injected into the grid.');
+		// console.info('Element', element, 'has been injected into the grid.');
 		return true;
 	}
 
-  manageDragDropCallBacks(element) {
+  	manageDragDropCallBacks(element) {
 		this.drawer.removeDragDropAttributes(element);
 		this.drawer.addDragDropAttributes(element, this.EVENTS, this);
 		//

@@ -2,17 +2,19 @@
 * Drawer class
 * HTML Handler class
 */
+
 class Drawer {
 	constructor(config, DOM){
 		console.info('Loading Drawer');
 		this.config = config;
 		this.DOM = DOM;
 		let element = this.DOM.ref;
-		this.DOM.height = element.offsetHeight;
-		this.DOM.width = element.offsetWidth;
+		// this.DOM.height = element.offsetHeight;
+		// this.DOM.width = element.offsetWidth;
 		this.DOM.DOMrect = this.DOM.ref.getBoundingClientRect();
 		this.preview = undefined;
-		console.log(this.DOM.DOMrect);
+		this.hiddenDragImage = undefined;
+		// console.log(this.DOM.DOMrect);
 	}
 
 	init(struct) {
@@ -21,11 +23,21 @@ class Drawer {
 	getDOM() {
 		return this.DOM;
 	}
+	getHiddenDragImage() {
+		if (typeof this.hiddenDragImage === "undefined") {
+			this.hiddenDragImage = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+			this.hiddenDragImage.height = this.hiddenDragImage.width = 1;
+			document.body.appendChild(this.hiddenDragImage);
+		}
+		return this.hiddenDragImage;
+	}
 	getPreview() {
 		if (typeof this.preview === "undefined") {
-			this.preview = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
-  		this.preview.width = this.preview.height = 1;
-			document.body.appendChild(this.preview);
+			this.preview = {dom: document.createElementNS("http://www.w3.org/1999/xhtml", "canvas")};
+			this.preview.height = this.preview.width = 0;
+			this.preview.dom.addClass("preview");
+			this.preview.dom.setAttribute("id", "preview-opacity");
+			this.getDOM().ref.appendChild(this.preview.dom);
 		}
 		return this.preview;
 	}
@@ -79,19 +91,26 @@ class Drawer {
 	}
 
 	addDragDropAttributes(element, EVENTS, self) {
-			element.dom.addEventListener('drag', function(event) {
+		var lastTime = 0;
+		element.dom.addEventListener('drag', function(event) {
+			// avoid to get too many events, because each time we modify DOM attributes
+			if (Date.now() - lastTime > 50) {
 				EVENTS.drag(self, event, element);
-			});
-			element.dom.addEventListener('dragstart', function(event) {
-				EVENTS.dragstart(self, event, element);
-			});
-			element.dom.addEventListener('dragend', function(event) {
-				EVENTS.dragend(self, event, element);
-			});
+				lastTime = Date.now();
+			}
+		});
+		element.dom.addEventListener('dragstart', function(event) {
+			element.dom.addClass("dragging");
+			EVENTS.dragstart(self, event, element);
+		});
+		element.dom.addEventListener('dragend', function(event) {
+			element.dom.removeClass("dragging");
+			EVENTS.dragend(self, event, element);
+		});
 	}
 
   draw(element) {
-  	console.log('Adding attributes on element : ', element);
+ //  	console.log('Adding attributes on element : ', element);
   	element.dom.setAttribute('sg-col', element.col);
   	element.dom.setAttribute('sg-row', element.row);
   	element.dom.setAttribute('sg-width', element.width);
@@ -117,8 +136,8 @@ class Drawer {
 
 		col = (x - this.DOM.DOMrect.left) / (this.config.marginWidth + this.config.blockWidth);
 		row = (y - this.DOM.DOMrect.top) / (this.config.marginHeight + this.config.blockHeight);
-		console.log("pxToPos : col=", Math.ceil(col), "row=",Math.ceil(row));
-		return {col:Math.floor(col), row:Math.floor(row)};
+		// console.log("pxToPos : col=", Math.floor(col), "row=",Math.floor(row));
+		return {col:Math.trunc(col), row:Math.trunc(row)};
 	}
 
 	addStyleTag(css) {

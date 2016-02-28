@@ -11,3 +11,11 @@ body {
       position: absolute;
       -khtml-user-drag: element;
       transition: all 0.2s ease-out; }
+      body #singlegrid .sg-widget .dragging {
+        opacity: 0.5; }
+    body #singlegrid .sg-widget.collide {
+      border: 1px solid red; }
+    body #singlegrid #preview-opacity.sg-widget {
+      opacity: 0.7;
+      border: 1px dotted black;
+      background-color: #eee; }

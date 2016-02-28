@@ -46,3 +46,24 @@ function throttle(fn, threshhold, scope) {
     }
   };
 }
+
+HTMLElement.prototype.addClass = function(newClass) {
+	var classes = this.className.split(" ");
+	for (var i = 0; i < classes.length; i++) {
+		if (classes[i] == newClass) {
+			return;
+		}
+	}
+	this.className += " " + newClass;
+};
+
+HTMLElement.prototype.removeClass = function(remove) {
+    var newClassName = "";
+	var classes = this.className.split(" ");
+	for (var i = 0; i < classes.length; i++) {
+        if (classes[i] !== remove) {
+            newClassName += classes[i] + ((i < classes.length - 1) ? "" : " ");
+        }
+    }
+    this.className = newClassName;
+};

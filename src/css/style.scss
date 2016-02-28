@@ -10,6 +10,17 @@ body {
 			position:absolute;
 			-khtml-user-drag: element;
 			transition: all 0.2s ease-out;
+			.dragging {
+				opacity:0.5;
+			}
+		}
+		.sg-widget.collide {
+			border: 1px solid red;
+		}
+		#preview-opacity.sg-widget {
+			opacity: 0.7;
+			border: 1px dotted black;
+			background-color: #eee;
 		}
 	}
 }

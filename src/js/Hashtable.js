@@ -4,7 +4,7 @@
 */
 class Hashtable {
 	constructor(config, DOM) {
-		console.log('Initialized Hashtable');
+		// console.log('Initialized Hashtable');
 		this.DOM = DOM;
 		this.hashtable = new Map();
 		this.config = config;
@@ -21,11 +21,14 @@ class Hashtable {
 	}
 
 	calculateGridSize() {
-		this.struct.nHorizontal = Math.floor(this.DOM.width / (this.config.blockWidth + this.config.marginWidth));
-		this.struct.nVertical = Math.floor(this.DOM.height / (this.config.blockHeight + this.config.marginHeight));
-		console.info(this.struct.nVertical, 'blocks vertically', this.struct.nHorizontal, 'blocks horizontally.');
+		this.struct.nHorizontal = Math.floor(this.DOM.DOMrect.width / (this.config.blockWidth + this.config.marginWidth));
+		this.struct.nVertical = Math.floor(this.DOM.DOMrect.height / (this.config.blockHeight + this.config.marginHeight));
+		//console.info(this.struct.nVertical, 'blocks vertically', this.struct.nHorizontal, 'blocks horizontally.');
 	}
-
+	addRows(n) {
+		this.struct.nVertical += n;
+		this.updateSize();
+	}
 	init() {
 		if (!this.config.hasOwnProperty('blockWidth') || !this.config.hasOwnProperty('blockHeight') ||
 			!this.config.hasOwnProperty('marginWidth') || !this.config.hasOwnProperty('marginHeight')) {
@@ -35,7 +38,7 @@ class Hashtable {
 
 		this.updateSize();
 
-		console.info('Hashtable : ', this.hashtable);
+		// console.info('Hashtable : ', this.hashtable);
 		return true;
 	}
 
@@ -75,7 +78,7 @@ class Hashtable {
 	}
 
 	update(element) {
-		console.log("UPDATE ELEMENTS");
+		// console.log("UPDATE ELEMENTS");
 		if (!element.hasOwnProperty('col') || !element.hasOwnProperty('row')) {
 			console.warn('Element', element, 'has no correct coordinates.');
 			return false;
@@ -113,7 +116,8 @@ class Hashtable {
 		var array = [];
 		for (let row = y; row < y + height; row++) {
 			let line = this.hashtable.get(row);
-			if (!line) break;
+			if (!line) {break;}
+			//console.log(y, row, line);
 			for (let col = x; col < x + width; col++) {
 				let element = line.get(col);
 				if (element !== undefined && !objectExists(array, element)) {
@@ -127,7 +131,7 @@ class Hashtable {
 	collide(x, y, width, height) {
 		for (let row = y; row < y + height; row++) {
 			let line = this.hashtable.get(row);
-			if (testLine(width, line, x) == false) {
+			if (line && this.testLine(width, line, x) == false) {
 				return true;
 			}
 		}
@@ -136,7 +140,7 @@ class Hashtable {
 
 	testLine(width, line, position) {
 		let consecutiveCols = 0;
-		for (let y = position; y < this.struct.nHorizontal; y++) {
+		for (let y = position; y < this.struct.nHorizontal && y < position + width; y++) {
 			let col = line.get(y);
 			consecutiveCols += 1;
 			if (col !== undefined) {
@@ -148,9 +152,8 @@ class Hashtable {
 	}
 
 	findPosition(width, height) {
-		console.log("FIND POSITIONS");
 		if (height > this.hashtable.size) {
-			console.warn('The asked height is bigger than the grid height ..');
+			// console.warn('The asked height is bigger than the grid height ..');
 			return false;
 		}
 		let heightMax = height;
@@ -167,7 +170,7 @@ class Hashtable {
 						countLines += 1;
 					}
 					if (countLines == height) {
-						console.log("Found appropriate positon : ", x, y - (height - 1));
+						// console.log("Found appropriate positon : ", x, y - (height - 1));
 						return {col:x, row:y - (height - 1)};
 					}
 				}
